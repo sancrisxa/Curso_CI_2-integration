@@ -14,7 +14,8 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - /postgres-data:/var/lib/postgresql/data
+      # ALTERADO: Usando um volume nomeado em vez de caminho absoluto na raiz
+      - postgres-data:/var/lib/postgresql/data
 
   pgadmin-compose:
     image: dpage/pgadmin4
@@ -25,3 +26,7 @@ services:
       - "54321:80"
     depends_on:
       - postgres
+
+# Adicione isso no final do arquivo para declarar o volume nomeado
+volumes:
+  postgres-data:
