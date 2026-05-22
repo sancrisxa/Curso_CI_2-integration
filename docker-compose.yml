@@ -26,4 +26,4 @@ services:
       - postgres
 
 volumes:
-  postgres-data:
+  curso_ci_2-integration_postgres-data:
