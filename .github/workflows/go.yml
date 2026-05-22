@@ -1,56 +1,22 @@
-name: Go
+version: "3"
+services:
+  postgres:
+    image: "postgres"
+    environment:
+      - POSTGRES_USER=root
+      - POSTGRES_PASSWORD=root
+      - POSTGRES_DB=root
+    ports:
+      - "5432:5432"
+    volumes:
+      - /postgres-data:/var/lib/postgresql/data
 
-on:
-  push:
-    branches: ["*"]
-  pull_request:
-    branches: ["*"]
-
-jobs:
-  test:
-    runs-on: ${{ matrix.os }}
-    env:
-      HOST: localhost
-      PORT: 5432
-      USER: root
-      PASSWORD: root
-      DBNAME: root
-    strategy:
-      matrix:
-        go_version: ["1.18", "1.17", ">=1.18"]
-        os: ["ubuntu-latest", "ubuntu-18.04"]
-    steps:
-      - uses: actions/checkout@v3
-
-      - name: Set up Go
-        uses: actions/setup-go@v3
-        with:
-          go-version: ${{ matrix.go_version }}
-
-      - name: Build-DB
-        run: docker compose build
-
-      - name: Create-DB
-        run: docker compose up -d --wait
-
-      - name: Wait for DB
-        run: sleep 3
-
-      - name: Test
-        run: go test -v main_test.go
-
-  build:
-    needs: test
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: ["ubuntu-latest", "ubuntu-18.04"]
-    steps:
-      - uses: actions/checkout@v3
-      - name: Build
-        run: go build -v main.go
-
-  docker:
-    needs: build
-    uses: ./.github/workflows/Docker.yml
-    secrets: inherit
+  pgadmin-compose:
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: "gui@alura.com"
+      PGADMIN_DEFAULT_PASSWORD: "123456"
+    ports:
+      - "54321:80"
+    depends_on:
+      - postgres
